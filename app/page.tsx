@@ -1,65 +1,100 @@
-import Image from "next/image";
-
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="container mx-auto px-4 py-16">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-5xl font-bold text-white mb-4">
+            BA Documentation Generator
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-xl text-gray-300 mb-8">
+            Transform business requirements into professional documents with AI
+          </p>
+          <p className="text-gray-400">
+            BRD → SRS → FRD | IEEE & IIBA Standards
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Features Grid */}
+        <div className="grid md:grid-3 gap-8 mb-12">
+          {/* Feature 1: Generate BRD */}
+          <div className="bg-white/10 backdrop-blur-lg rounded-lg p-6 border border-white/20">
+            <div className="text-3xl mb-4">📝</div>
+            <h3 className="text-xl font-semibold text-white mb-2">
+              Generate BRD
+            </h3>
+            <p className="text-gray-300 mb-4">
+              Create professional Business Requirements Documents from your input using AI
+            </p>
+            <a
+              href="/new"
+              className="inline-block px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition"
+            >
+              Create BRD
+            </a>
+          </div>
+
+          {/* Feature 2: Transform */}
+          <div className="bg-white/10 backdrop-blur-lg rounded-lg p-6 border border-white/20">
+            <div className="text-3xl mb-4">🔄</div>
+            <h3 className="text-xl font-semibold text-white mb-2">
+              Transform Documents
+            </h3>
+            <p className="text-gray-300 mb-4">
+              Convert BRD → SRS → FRD automatically following standards
+            </p>
+            <a
+              href="/documents"
+              className="inline-block px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+            >
+              View Documents
+            </a>
+          </div>
+
+          {/* Feature 3: Export */}
+          <div className="bg-white/10 backdrop-blur-lg rounded-lg p-6 border border-white/20">
+            <div className="text-3xl mb-4">📥</div>
+            <h3 className="text-xl font-semibold text-white mb-2">
+              Export Markdown
+            </h3>
+            <p className="text-gray-300 mb-4">
+              Download documents as formatted Markdown with metadata
+            </p>
+            <button
+              className="inline-block px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition"
+              disabled
+            >
+              Coming Soon
+            </button>
+          </div>
         </div>
-      </main>
-    </div>
+
+        {/* AI Provider Info */}
+        <div className="bg-white/5 backdrop-blur-lg rounded-lg p-6 border border-white/10">
+          <h3 className="text-lg font-semibold text-white mb-3">
+            ⚡ Dual AI Support
+          </h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-purple-400 font-medium mb-1">Ollama (Local)</p>
+              <p className="text-sm text-gray-400">
+                100% offline, private, unlimited usage
+              </p>
+            </div>
+            <div>
+              <p className="text-blue-400 font-medium mb-1">Gemini Free (Cloud)</p>
+              <p className="text-sm text-gray-400">
+                Fast, smart, 15 requests/min (free tier)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center mt-12 text-gray-500 text-sm">
+          <p>Following IEEE 29148, IEEE 830 & IIBA BABOK v3 Standards</p>
+        </div>
+      </div>
+    </main>
   );
 }

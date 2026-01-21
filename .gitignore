@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# test files
+test-*.js
+list-models.js
+
+# debug
+debug-*.md
+
+# database
+*.db
+*.db-journal

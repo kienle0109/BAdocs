@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  type        String   // "BRD", "SRS", "FRD"
+  title       String
+  content     String   // JSON string
+  markdown    String   // Rendered markdown
+  template    String   // "IEEE", "IIBA"
+  sourceId    String?  // Link to parent document
+  source      Document? @relation("DocumentChain", fields: [sourceId], references: [id], onDelete: SetNull)
+  children    Document[] @relation("DocumentChain")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([type])
+  @@index([sourceId])
+}
+
+model DocumentTemplate {
+  id          String   @id @default(cuid())
+  name        String   // "BRD-IEEE", "SRS-IIBA", etc.
+  type        String   // "BRD", "SRS", "FRD"
+  standard    String   // "IEEE", "IIBA"
+  sections    String   // JSON array of section definitions
+  prompt      String   // AI prompt template
+  createdAt   DateTime @default(now())
+  
+  @@unique([name])
+}
+
+model GenerationHistory {
+  id            String   @id @default(cuid())
+  documentId    String
+  inputData     String   // JSON snapshot of input
+  aiProvider    String   // "ollama", "gemini"
+  aiModel       String   // "llama3.1:8b", "gemini-2.0-flash-exp"
+  tokensUsed    Int
+  generatedAt   DateTime @default(now())
+  
+  @@index([documentId])
+  @@index([aiProvider])
+}

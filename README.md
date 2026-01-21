@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BA Documentation Generator
 
-## Getting Started
+AI-powered tool for Business Analysts to create professional BRD, SRS, and FRD documents following IEEE and IIBA standards.
 
-First, run the development server:
+## Features
+
+- ✅ **Generate BRD** from text input using AI
+- ✅ **Transform BRD → SRS → FRD** automatically
+- ✅ **Dual AI Support**: Ollama (local, offline) or Gemini Free (cloud, fast)
+- ✅ **IEEE & IIBA Templates**: Choose between international standards
+- ✅ **Export Markdown**: Download documents with YAML frontmatter
+- ✅ **Document Chain Tracking**: See full traceability from BRD to FRD
+
+## Tech Stack
+
+- **Frontend**: Next.js 15 + TypeScript + Tailwind CSS
+- **Backend**: Next.js API Routes + Prisma + SQLite
+- **AI**: Ollama (local) + Google Gemini (free cloud API)
+- **Database**: SQLite with Prisma ORM
+
+## Setup
+
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+### 2. Setup Database
+
+```bash
+npx prisma migrate dev
+```
+
+### 3. Configure AI Provider
+
+**Option A: Ollama (Local - Recommended for Privacy)**
+
+```bash
+# Install Ollama from https://ollama.com
+# Pull model:
+ollama pull llama3.1:8b
+
+# Verify:
+curl http://localhost:11434/api/tags
+```
+
+**Option B: Gemini Free (Cloud - Faster)**
+
+```bash
+# Get free API key: https://aistudio.google.com/apikey
+# Add to .env:
+echo "GEMINI_API_KEY=your_key_here" >> .env
+```
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Create BRD**: Input business requirements → Select AI provider & template → Generate
+2. **Transform**: BRD → Click "Transform to SRS" → SRS → Click "Transform to FRD"
+3. **Export**: Click "Export Markdown" to download document
 
-## Learn More
+## Document Standards
 
-To learn more about Next.js, take a look at the following resources:
+- **IEEE 29148** - Business Requirements
+- **IEEE 830** - Software Requirements  
+- **IIBA BABOK v3** - Business Analysis Body of Knowledge
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## API Endpoints
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/generate` | POST | Generate BRD from input |
+| `/api/transform/brd-to-srs` | POST | Transform BRD to SRS |
+| `/api/transform/srs-to-frd` | POST | Transform SRS to FRD |
+| `/api/documents` | GET | List all documents |
+| `/api/documents/[id]` | GET | Get single document |
+| `/api/documents/[id]/export` | GET | Export as Markdown |
+| `/api/documents/[id]` | DELETE | Delete document |
 
-## Deploy on Vercel
+## License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
