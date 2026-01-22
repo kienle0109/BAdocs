@@ -5,7 +5,7 @@ import { prisma } from '@/lib/db';
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { inputMethod, data, template, aiProvider } = body;
+        const { inputMethod, data, template, aiProvider, language = 'en' } = body;
 
         // Validate inputs
         if (!data) {
@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
             input: inputText,
             template: template as 'IEEE' | 'IIBA',
             provider: aiProvider as 'ollama' | 'gemini',
+            language: language as 'en' | 'vi',
         });
 
         const generationTime = Date.now() - startTime;

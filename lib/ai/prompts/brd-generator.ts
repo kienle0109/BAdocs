@@ -1,11 +1,23 @@
-export function buildPrompt(input: string, template: 'IEEE' | 'IIBA'): string {
+export function buildPrompt(input: string, template: 'IEEE' | 'IIBA', language: 'en' | 'vi' = 'en'): string {
+    const languageInstruction = language === 'vi'
+        ? `LANGUAGE REQUIREMENT:
+- Write the ENTIRE document in Vietnamese (Tiếng Việt)
+- Use professional Vietnamese business terminology
+- Keep section numbers in standard format (1., 1.1, etc.)
+- Technical terms can remain in English with Vietnamese explanation in parentheses
+- Maintain formal, professional tone throughout
+
+`
+        : '';
+
     const basePrompt = `You are a senior Business Analyst expert specializing in ${template} standards.
 
-USER INPUT:
+${languageInstruction}USER INPUT:
 ${input}
 
 TASK:
 Generate a professional Business Requirements Document (BRD) following the ${template} standard.
+${language === 'vi' ? 'The document MUST be written entirely in Vietnamese.' : ''}
 
 ${template === 'IEEE' ? IEEE_BRD_STRUCTURE : IIBA_BRD_STRUCTURE}
 

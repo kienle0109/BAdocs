@@ -8,6 +8,7 @@ interface GenerateOptions {
     input: string;
     template: 'IEEE' | 'IIBA';
     provider?: AIProvider;
+    language?: 'en' | 'vi';
 }
 
 interface TransformOptions {
@@ -25,16 +26,25 @@ export async function generateDocument(
 
     let content: string;
     let model: string;
+    let actualProvider: AIProvider = provider;
 
     if (provider === 'gemini') {
-        content = await generateWithGemini(options);
-        model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+        try {
+            content = await generateWithGemini(options);
+            model = process.env.GEMINI_MODEL || 'gemini-flash-latest';
+        } catch (error: any) {
+            // Auto-fallback to Ollama when Gemini fails (quota exceeded, etc.)
+            console.warn(`Gemini failed, falling back to Ollama: ${error.message}`);
+            content = await generateWithOllama(options);
+            model = process.env.OLLAMA_MODEL || 'llama3.1:8b';
+            actualProvider = 'ollama';
+        }
     } else {
         content = await generateWithOllama(options);
         model = process.env.OLLAMA_MODEL || 'llama3.1:8b';
     }
 
-    return { content, provider, model };
+    return { content, provider: actualProvider, model };
 }
 
 export async function transformDocument(
@@ -44,14 +54,23 @@ export async function transformDocument(
 
     let content: string;
     let model: string;
+    let actualProvider: AIProvider = provider;
 
     if (provider === 'gemini') {
-        content = await transformWithGemini(options);
-        model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+        try {
+            content = await transformWithGemini(options);
+            model = process.env.GEMINI_MODEL || 'gemini-flash-latest';
+        } catch (error: any) {
+            // Auto-fallback to Ollama when Gemini fails (quota exceeded, etc.)
+            console.warn(`Gemini failed, falling back to Ollama: ${error.message}`);
+            content = await transformWithOllama(options);
+            model = process.env.OLLAMA_MODEL || 'llama3.1:8b';
+            actualProvider = 'ollama';
+        }
     } else {
         content = await transformWithOllama(options);
         model = process.env.OLLAMA_MODEL || 'llama3.1:8b';
     }
 
-    return { content, provider, model };
+    return { content, provider: actualProvider, model };
 }

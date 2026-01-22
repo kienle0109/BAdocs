@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-const DEFAULT_MODEL = 'gemini-2.0-flash'; // Available in free tier
+const DEFAULT_MODEL = 'gemini-flash-latest';
 
 
 
@@ -9,6 +9,7 @@ interface GenerateOptions {
     type: 'BRD' | 'SRS' | 'FRD';
     input: string;
     template: 'IEEE' | 'IIBA';
+    language?: 'en' | 'vi';
 }
 
 interface TransformOptions {
@@ -21,7 +22,7 @@ interface TransformOptions {
 export async function generateWithGemini(
     options: GenerateOptions
 ): Promise<string> {
-    const { type, input, template } = options;
+    const { type, input, template, language = 'en' } = options;
 
     try {
         if (!process.env.GEMINI_API_KEY) {
@@ -34,7 +35,7 @@ export async function generateWithGemini(
 
         // Build prompt based on type and template
         const promptModule = await import(`./prompts/${type.toLowerCase()}-generator`);
-        const prompt = promptModule.buildPrompt(input, template);
+        const prompt = promptModule.buildPrompt(input, template, language);
 
         const result = await model.generateContent(prompt);
         const response = await result.response;

@@ -10,6 +10,7 @@ interface GenerateOptions {
     type: 'BRD' | 'SRS' | 'FRD';
     input: string;
     template: 'IEEE' | 'IIBA';
+    language?: 'en' | 'vi';
 }
 
 interface TransformOptions {
@@ -22,11 +23,11 @@ interface TransformOptions {
 export async function generateWithOllama(
     options: GenerateOptions
 ): Promise<string> {
-    const { type, input, template } = options;
+    const { type, input, template, language = 'en' } = options;
 
     // Build prompt based on type and template
     const promptModule = await import(`./prompts/${type.toLowerCase()}-generator`);
-    const prompt = promptModule.buildPrompt(input, template);
+    const prompt = promptModule.buildPrompt(input, template, language);
 
     const response = await ollama.chat({
         model: process.env.OLLAMA_MODEL || DEFAULT_MODEL,
