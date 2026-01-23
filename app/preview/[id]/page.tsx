@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import { Header } from '@/components/Header';
 
 interface Document {
     id: string;
@@ -615,97 +616,97 @@ export default function PreviewPage() {
     const nextDocType = document.type === 'BRD' ? 'SRS' : document.type === 'SRS' ? 'FRD' : null;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
-            <div className="max-w-6xl mx-auto">
-                {/* Header */}
-                <div className="mb-8">
-                    {/* Back Button */}
-                    <a
-                        href="/history"
-                        className="inline-flex items-center text-gray-400 hover:text-white transition-colors cursor-pointer mb-4"
-                    >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                        Back to History
-                    </a>
-
-                    <div className="flex items-center justify-between mb-4">
-                        <div>
-                            <span className="inline-block px-3 py-1 bg-purple-600 text-white rounded-full text-sm font-medium mb-2">
-                                {document.type} | {document.template}
-                            </span>
-                            <h1 className="text-4xl font-bold text-white">
-                                {document.title}
-                            </h1>
-                            <p className="text-gray-400 mt-2">
-                                Created: {new Date(document.createdAt).toLocaleString()}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex flex-wrap gap-3">
-                        {nextDocType && (
-                            <>
-                                <select
-                                    value={aiProvider}
-                                    onChange={(e) => setAiProvider(e.target.value as 'ollama' | 'gemini')}
-                                    className="px-4 py-2 bg-slate-800 text-white rounded-lg border border-white/20 cursor-pointer"
-                                >
-                                    <option value="ollama">Ollama (Local)</option>
-                                    <option value="gemini">Gemini Free</option>
-                                </select>
-                                <button
-                                    onClick={handleTransform}
-                                    disabled={transforming}
-                                    className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg font-medium transition disabled:opacity-50 cursor-pointer"
-                                >
-                                    {transforming ? 'Transforming...' : `Transform to ${nextDocType}`}
-                                </button>
-                            </>
-                        )}
-
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+            <Header
+                showBack
+                backHref="/history"
+                backLabel="History"
+                title={document.title}
+                actions={
+                    <div className="flex items-center gap-2">
                         {/* Export Buttons */}
                         <button
                             onClick={handleExportPDF}
                             disabled={exporting === 'pdf'}
-                            className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                            className="hidden sm:flex px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium text-sm transition disabled:opacity-50 items-center gap-2 cursor-pointer"
                         >
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M4 18h12a2 2 0 002-2V6l-4-4H4a2 2 0 00-2 2v12a2 2 0 002 2zm5-9V5l4 4h-4z" />
                             </svg>
-                            {exporting === 'pdf' ? 'Exporting...' : 'Export PDF'}
+                            {exporting === 'pdf' ? 'Exporting...' : 'PDF'}
                         </button>
 
                         <button
                             onClick={handleExportDOCX}
                             disabled={exporting === 'docx'}
-                            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                            className="hidden sm:flex px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition disabled:opacity-50 items-center gap-2 cursor-pointer"
                         >
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M4 18h12a2 2 0 002-2V6l-4-4H4a2 2 0 00-2 2v12a2 2 0 002 2zm5-9V5l4 4h-4z" />
                             </svg>
-                            {exporting === 'docx' ? 'Exporting...' : 'Export DOCX'}
+                            {exporting === 'docx' ? 'Exporting...' : 'DOCX'}
                         </button>
 
-                        <button
-                            onClick={handleExportMarkdown}
-                            className="px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition flex items-center gap-2 cursor-pointer"
-                        >
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                            </svg>
-                            Export MD
-                        </button>
-
-                        <button
-                            onClick={() => router.push('/')}
-                            className="px-5 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition cursor-pointer"
-                        >
-                            Back to Home
-                        </button>
+                        {nextDocType && (
+                            <button
+                                onClick={handleTransform}
+                                disabled={transforming}
+                                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg font-medium text-sm transition disabled:opacity-50 cursor-pointer"
+                            >
+                                {transforming ? 'Transforming...' : `To ${nextDocType}`}
+                            </button>
+                        )}
                     </div>
+                }
+            />
+
+            <div className="max-w-6xl mx-auto px-4 py-8">
+                {/* Document Info */}
+                <div className="mb-6">
+                    <div className="flex items-center gap-3 mb-2">
+                        <span className="inline-block px-3 py-1 bg-purple-600 text-white rounded-full text-sm font-medium">
+                            {document.type} | {document.template}
+                        </span>
+                    </div>
+                    <h1 className="text-3xl font-bold text-white mb-2">
+                        {document.title}
+                    </h1>
+                    <p className="text-gray-400">
+                        Created: {new Date(document.createdAt).toLocaleString()}
+                    </p>
+                </div>
+
+                {/* Mobile Export Actions */}
+                <div className="flex sm:hidden flex-wrap gap-2 mb-6">
+                    <button
+                        onClick={handleExportPDF}
+                        disabled={exporting === 'pdf'}
+                        className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium text-sm transition disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 18h12a2 2 0 002-2V6l-4-4H4a2 2 0 00-2 2v12a2 2 0 002 2zm5-9V5l4 4h-4z" />
+                        </svg>
+                        PDF
+                    </button>
+                    <button
+                        onClick={handleExportDOCX}
+                        disabled={exporting === 'docx'}
+                        className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 18h12a2 2 0 002-2V6l-4-4H4a2 2 0 00-2 2v12a2 2 0 002 2zm5-9V5l4 4h-4z" />
+                        </svg>
+                        DOCX
+                    </button>
+                    <button
+                        onClick={handleExportMarkdown}
+                        className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium text-sm transition flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                        MD
+                    </button>
                 </div>
 
                 {/* Document Chain */}

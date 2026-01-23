@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Header } from '@/components/Header';
 
 interface Document {
     id: string;
@@ -72,19 +73,12 @@ export default function HistoryPage() {
 
     return (
         <main className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+            <Header />
+
             <div className="container mx-auto px-4 py-8">
-                {/* Header */}
+                {/* Page Title */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
                     <div>
-                        <Link
-                            href="/"
-                            className="inline-flex items-center text-gray-400 hover:text-white transition-colors mb-4 cursor-pointer"
-                        >
-                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                            </svg>
-                            Back to Home
-                        </Link>
                         <h1 className="text-4xl font-bold text-white mb-2">
                             Document History
                         </h1>
@@ -112,8 +106,8 @@ export default function HistoryPage() {
                                 key={btn.value}
                                 onClick={() => setActiveFilter(btn.value)}
                                 className={`px-4 py-2 rounded-lg font-medium transition-all cursor-pointer ${activeFilter === btn.value
-                                        ? 'bg-purple-600 text-white'
-                                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                    ? 'bg-purple-600 text-white'
+                                    : 'bg-white/10 text-gray-300 hover:bg-white/20'
                                     }`}
                             >
                                 {btn.label}

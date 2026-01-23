@@ -1,7 +1,11 @@
+import { Header } from '@/components/Header';
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="container mx-auto px-4 py-16">
+      <Header />
+
+      <div className="container mx-auto px-4 py-12">
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-white mb-4">
@@ -52,17 +56,14 @@ export default function Home() {
               Generate SRS
             </h3>
             <p className="text-gray-300 mb-4 text-sm">
-              Create Software Requirements Specification from scratch or transform from BRD
+              Create Software Requirements Specifications directly from your technical requirements
             </p>
-            <button
-              disabled
-              className="inline-flex items-center px-5 py-2 bg-white/10 text-gray-400 rounded-lg font-medium cursor-not-allowed"
-            >
+            <span className="inline-flex items-center px-4 py-2 bg-gray-600/50 text-gray-300 rounded-lg font-medium">
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Coming Soon
-            </button>
+            </span>
           </div>
 
           {/* Feature 3: Generate FRD (Coming Soon) */}
@@ -76,35 +77,32 @@ export default function Home() {
               Generate FRD
             </h3>
             <p className="text-gray-300 mb-4 text-sm">
-              Create Functional Requirements Document from scratch or transform from SRS
+              Create Functional Requirements Documents to detail system functionality
             </p>
-            <button
-              disabled
-              className="inline-flex items-center px-5 py-2 bg-white/10 text-gray-400 rounded-lg font-medium cursor-not-allowed"
-            >
+            <span className="inline-flex items-center px-4 py-2 bg-gray-600/50 text-gray-300 rounded-lg font-medium">
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Coming Soon
-            </button>
+            </span>
           </div>
 
           {/* Feature 4: Document History */}
           <div className="bg-white/10 backdrop-blur-lg rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all cursor-pointer group">
-            <div className="w-12 h-12 rounded-lg bg-cyan-600/20 flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            <div className="w-12 h-12 rounded-lg bg-orange-600/20 flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-cyan-300 transition-colors">
+            <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-orange-300 transition-colors">
               Document History
             </h3>
             <p className="text-gray-300 mb-4 text-sm">
-              View and manage all your generated documents in one place
+              View and manage all your previously generated documents in one place
             </p>
             <a
               href="/history"
-              className="inline-flex items-center px-5 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition font-medium cursor-pointer"
+              className="inline-flex items-center px-5 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition font-medium cursor-pointer"
             >
               View History
               <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,30 +113,29 @@ export default function Home() {
         </div>
 
         {/* AI Provider Info */}
-        <div className="bg-white/5 backdrop-blur-lg rounded-lg p-6 border border-white/10">
-          <h3 className="text-lg font-semibold text-white mb-3">
-            ⚡ Dual AI Support
-          </h3>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-purple-400 font-medium mb-1">Ollama (Local)</p>
-              <p className="text-sm text-gray-400">
-                100% offline, private, unlimited usage
-              </p>
+        <div className="bg-white/5 backdrop-blur-lg rounded-xl p-8 border border-white/10">
+          <div className="flex items-center gap-3 mb-6">
+            <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <h2 className="text-2xl font-bold text-white">AI Support</h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white/5 rounded-lg p-5 border border-white/10">
+              <h3 className="text-lg font-semibold text-white mb-2">Ollama (Local)</h3>
+              <p className="text-gray-400 text-sm">Completely offline, private, and unlimited usage. Perfect for sensitive data.</p>
             </div>
-            <div>
-              <p className="text-blue-400 font-medium mb-1">Gemini Free (Cloud)</p>
-              <p className="text-sm text-gray-400">
-                Fast, smart, 15 requests/min (free tier)
-              </p>
+            <div className="bg-white/5 rounded-lg p-5 border border-white/10">
+              <h3 className="text-lg font-semibold text-white mb-2">Gemini Free (Cloud)</h3>
+              <p className="text-gray-400 text-sm">Fast, powerful, and free tier available. Great for quick generation.</p>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-12 text-gray-500 text-sm">
+        <footer className="text-center mt-12 text-gray-500 text-sm">
           <p>Following IEEE 29148, IEEE 830 & IIBA BABOK v3 Standards</p>
-        </div>
+        </footer>
       </div>
     </main>
   );
