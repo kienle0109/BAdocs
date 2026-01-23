@@ -331,7 +331,7 @@ export default function PreviewPage() {
                     orientation: 'portrait'
                 },
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
+            } as any;
 
             await html2pdf().set(opt).from(printContainer).save();
         } catch (error: any) {
