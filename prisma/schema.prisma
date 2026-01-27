@@ -6,9 +6,11 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
+
 
 model Document {
   id          String   @id @default(cuid())
@@ -17,6 +19,8 @@ model Document {
   content     String   // JSON string
   markdown    String   // Rendered markdown
   template    String   // "IEEE", "IIBA"
+  sdlcModel   String?  @default("waterfall") // "waterfall", "agile"
+  userId      String   // Supabase User ID
   sourceId    String?  // Link to parent document
   source      Document? @relation("DocumentChain", fields: [sourceId], references: [id], onDelete: SetNull)
   children    Document[] @relation("DocumentChain")
@@ -25,6 +29,7 @@ model Document {
   
   @@index([type])
   @@index([sourceId])
+  @@index([userId])
 }
 
 model DocumentTemplate {
@@ -42,6 +47,7 @@ model DocumentTemplate {
 model GenerationHistory {
   id            String   @id @default(cuid())
   documentId    String
+  userId        String   // Supabase User ID
   inputData     String   // JSON snapshot of input
   aiProvider    String   // "ollama", "gemini"
   aiModel       String   // "llama3.1:8b", "gemini-2.0-flash-exp"
@@ -50,4 +56,6 @@ model GenerationHistory {
   
   @@index([documentId])
   @@index([aiProvider])
+  @@index([userId])
 }
+

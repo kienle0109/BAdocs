@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #020617;
+  /* slate-950 */
+  --foreground: #e2e8f0;
+  /* slate-200 */
 }
 
 @theme inline {
@@ -12,17 +14,32 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+  /* slate-900 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  /* slate-700 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+  /* slate-600 */
 }
 
 /* Markdown Prose Styles for Dark Mode */
@@ -102,7 +119,8 @@ body {
 }
 
 .markdown-content thead {
-  background: rgba(139, 92, 246, 0.2);
+  background: rgba(99, 102, 241, 0.2);
+  /* indigo-500/20 */
 }
 
 .markdown-content th {
@@ -124,7 +142,7 @@ body {
 }
 
 .markdown-content tbody tr:hover {
-  background: rgba(139, 92, 246, 0.1);
+  background: rgba(99, 102, 241, 0.1);
 }
 
 /* Code Styles */
@@ -153,7 +171,8 @@ body {
 
 /* Blockquote */
 .markdown-content blockquote {
-  border-left: 4px solid #8b5cf6;
+  border-left: 4px solid #6366f1;
+  /* indigo-500 */
   padding-left: 1rem;
   margin: 1rem 0;
   color: #94a3b8;
@@ -185,6 +204,25 @@ body {
 
 .markdown-content em {
   font-style: italic;
+}
+
+/* Custom Scrollbar Helper (if needed additionally) */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Print Styles for PDF Export */

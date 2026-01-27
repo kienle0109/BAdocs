@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { createClient } from '@/lib/supabase/server';
 
 // GET /api/documents/[id] - Get single document
 export async function GET(
@@ -8,9 +9,21 @@ export async function GET(
 ) {
     const { id } = await params;
     try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
 
-        const document = await prisma.document.findUnique({
-            where: { id },
+        if (!user) {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 }
+            );
+        }
+
+        const document = await prisma.document.findFirst({
+            where: {
+                id,
+                userId: user.id
+            },
             include: {
                 source: {
                     select: {
@@ -61,10 +74,29 @@ export async function DELETE(
 ) {
     const { id } = await params;
     try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
 
-        await prisma.document.delete({
-            where: { id },
+        if (!user) {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 }
+            );
+        }
+
+        const result = await prisma.document.deleteMany({
+            where: {
+                id,
+                userId: user.id
+            },
         });
+
+        if (result.count === 0) {
+            return NextResponse.json(
+                { error: 'Document not found or access denied' },
+                { status: 404 }
+            );
+        }
 
         return NextResponse.json({
             success: true,

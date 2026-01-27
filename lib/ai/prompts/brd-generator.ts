@@ -1,44 +1,88 @@
-export function buildPrompt(input: string, template: 'IEEE' | 'IIBA', language: 'en' | 'vi' = 'en'): string {
+export interface BRDInput {
+    projectName: string;
+    description: string;
+    stakeholders?: string[];
+    features?: string[];
+    scope?: {
+        inScope?: string[];
+        outOfScope?: string[];
+    };
+    targetAudience?: string;
+    // Enhanced fields
+    goals?: {
+        primary?: string[];
+        metrics?: any[];
+        timeline?: string;
+    };
+    constraints?: {
+        budget?: string;
+        timeline?: string;
+        technical?: string;
+        risks?: any[];
+    };
+}
+
+export function buildPrompt(input: BRDInput | string, template: 'IEEE' | 'IIBA', language: 'en' | 'vi' = 'en'): string {
+    // 0. Handle Legacy String Input (Fallback)
+    let structuredInput: BRDInput;
+    if (typeof input === 'string') {
+        structuredInput = {
+            projectName: "Unspecified Project",
+            description: input,
+        };
+    } else {
+        structuredInput = input;
+    }
+
+    // 1. Context Build
+    const projectContext = `
+PROJECT CONTEXT:
+- Name: ${structuredInput.projectName}
+- Core Concept: ${structuredInput.description}
+- Key Stakeholders: ${structuredInput.stakeholders?.join(', ') || 'To be identified by AI based on domain'}
+- Target Users: ${structuredInput.targetAudience || 'General users'}
+- Key Features Initial List: ${structuredInput.features?.join('; ') || 'Not specified'}
+- Scope (In): ${structuredInput.scope?.inScope?.join('; ') || 'As implied by description'}
+- Scope (Out): ${structuredInput.scope?.outOfScope?.join('; ') || 'None explicitly stated'}
+- Constraints: Budget(${structuredInput.constraints?.budget || 'N/A'}), Timeline(${structuredInput.constraints?.timeline || 'N/A'})
+`;
+
+    // 2. Language & Tone
     const languageInstruction = language === 'vi'
-        ? `LANGUAGE REQUIREMENT:
-- Write the ENTIRE document in Vietnamese (Tiếng Việt)
-- Use professional Vietnamese business terminology
-- Keep section numbers in standard format (1., 1.1, etc.)
-- Technical terms can remain in English with Vietnamese explanation in parentheses
-- Maintain formal, professional tone throughout
+        ? `LANGUAGE CONSTRAINT: VIETNAMESE (TIẾNG VIỆT) ONLY.
+           - Professional BA terminology (e.g., "Stakeholder" -> "Bên liên quan", "Requirement" -> "Yêu cầu").
+           - Tone: Formal, Objective, Precision.`
+        : `LANGUAGE CONSTRAINT: ENGLISH. Tone: Professional, IEEE Standard.`;
 
-`
-        : '';
+    // 3. The "Agent" Persona & Chain of Thought
+    const basePrompt = `
+You are a Lead Business Analyst with 15 years of experience in Software Engineering.
+Your task is to draft a specialized Business Requirements Document (BRD) based on the standard ${template}.
 
-    const basePrompt = `You are a senior Business Analyst expert specializing in ${template} standards.
+${languageInstruction}
 
-${languageInstruction}USER INPUT:
-${input}
+${projectContext}
 
-TASK:
-Generate a professional Business Requirements Document (BRD) following the ${template} standard.
-${language === 'vi' ? 'The document MUST be written entirely in Vietnamese.' : ''}
+### CRITICAL INSTRUCTION - "ENRICHMENT MODE":
+The user input provided above is just a starting point. Your job is NOT to just copy-paste it.
+You must **Analyzes & Expands** the requirements:
+1.  **Infer Missing Features**: If the user says "E-commerce App", you MUST automatically add requirements for "User Auth", "Product Catalog", "Cart", "Order Management", "Payment Gateway Integration" even if they weren't listed.
+2.  **Define Edge Cases**: Don't just list "Login"; list "Password Reset", "Lockout policy".
+3.  **Identify Hidden Stakeholders**: Add "System Admins", "Support Staff", "Third-party Providers".
+4.  **SMART Requirements**: Every requirement must be Specific, Measurable, Achievable, Relevant, Time-bound.
+
+### REQUIRED STRUCTURE (${template}):
+(The AI must generate the full Markdown content following this exact structure, filling it with the ENRICHED content)
 
 ${template === 'IEEE' ? IEEE_BRD_STRUCTURE : IIBA_BRD_STRUCTURE}
 
-FORMATTING REQUIREMENTS:
-1. Output in clean Markdown format
-2. Use proper heading hierarchy (# ## ###)
-3. Include numbered sections where appropriate
-4. Use bullet points for lists
-5. Use tables for stakeholder matrices and requirements lists
-6. Be specific and measurable - avoid vague language
-7. Follow professional BA terminology
+### GENERATION RULES:
+- **Do not** return any conversational text. Return ONLY the Markdown content.
+- **Do not** use placeholders like "[Insert text here]". YOU must write the content yourself based on the context.
+- Start directly with "# [Project Name] - Business Requirements Document".
 
-QUALITY STANDARDS:
-- Requirements must be SMART (Specific, Measurable, Achievable, Relevant, Time-bound)
-- Use active voice
-- Define all acronyms on first use
-- Include assumptions when data is unclear
-- Mark uncertain items as "[TBD]" for later refinement
-
-Generate the complete BRD document now:`;
-
+GENERATE DOCUMENT NOW:
+`;
     return basePrompt;
 }
 

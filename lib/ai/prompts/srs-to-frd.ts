@@ -1,5 +1,9 @@
-export function buildTransformPrompt(srsContent: string, template: 'IEEE' | 'IIBA'): string {
+export function buildTransformPrompt(srsContent: string, template: 'IEEE' | 'IIBA', language: 'en' | 'vi' = 'en'): string {
     const structureGuide = template === 'IEEE' ? IEEE_FRD_GUIDE : IIBA_FRD_GUIDE;
+
+    const langInstruction = language === 'vi'
+        ? 'IMPORTANT: The output must be entirely in VIETNAMESE language. Translate all headings, descriptions, and requirements to Vietnamese.'
+        : 'Output language: English.';
 
     return `You are a senior Technical Requirements Analyst expert specializing in ${template} standards.
 
@@ -22,6 +26,7 @@ TRANSFORMATION GUIDELINES:
 6. Define UI specifications in detail
 7. Specify data processing logic step-by-step
 8. Include edge cases and exception handling
+${language === 'vi' ? '9. COMPULSORY: All content, including headings and table contents, MUST be in VIETNAMESE.' : ''}
 
 QUALITY STANDARDS:
 - Each functional spec MUST have a unique ID (e.g., FRD-001, FRD-002)
@@ -36,6 +41,7 @@ FORMATTING:
 - Use Mermaid diagrams for workflows
 - Use tables for validation rules and test cases  
 - Use proper heading hierarchy
+- ${langInstruction}
 
 Generate the complete FRD document now:`;
 }

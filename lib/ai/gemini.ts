@@ -7,7 +7,7 @@ const DEFAULT_MODEL = 'gemini-flash-latest';
 
 interface GenerateOptions {
     type: 'BRD' | 'SRS' | 'FRD';
-    input: string;
+    input: string | any;
     template: 'IEEE' | 'IIBA';
     language?: 'en' | 'vi';
 }
@@ -17,6 +17,7 @@ interface TransformOptions {
     to: 'SRS' | 'FRD';
     sourceContent: string;
     template: 'IEEE' | 'IIBA';
+    language?: 'en' | 'vi';
 }
 
 export async function generateWithGemini(
@@ -42,23 +43,45 @@ export async function generateWithGemini(
 
         return response.text();
     } catch (error: any) {
-        // Enhanced error messages
-        if (error.status === 429) {
-            throw new Error(`Gemini API quota exceeded. Please try again later or use Ollama (local) instead. Details: ${error.message}`);
-        } else if (error.status === 401 || error.status === 403) {
-            throw new Error(`Gemini API authentication failed. Please check your GEMINI_API_KEY in .env file.`);
-        } else if (error.message?.includes('GEMINI_API_KEY')) {
-            throw error; // Re-throw our custom message
-        } else {
-            throw new Error(`Gemini API error: ${error.message || 'Unknown error'}`);
+        handleGeminiError(error);
+        return ''; // Should not reach here due to throw
+    }
+}
+
+export async function* generateWithGeminiStream(
+    options: GenerateOptions
+): AsyncGenerator<string, void, unknown> {
+    const { type, input, template, language = 'en' } = options;
+
+    try {
+        if (!process.env.GEMINI_API_KEY) {
+            throw new Error('GEMINI_API_KEY is not configured. Please add it to your .env file.');
         }
+
+        const model = genAI.getGenerativeModel({
+            model: process.env.GEMINI_MODEL || DEFAULT_MODEL
+        });
+
+        const promptModule = await import(`./prompts/${type.toLowerCase()}-generator`);
+        const prompt = promptModule.buildPrompt(input, template, language);
+
+        const result = await model.generateContentStream(prompt);
+
+        for await (const chunk of result.stream) {
+            const chunkText = chunk.text();
+            if (chunkText) {
+                yield chunkText;
+            }
+        }
+    } catch (error: any) {
+        handleGeminiError(error);
     }
 }
 
 export async function transformWithGemini(
     options: TransformOptions
 ): Promise<string> {
-    const { from, to, sourceContent, template } = options;
+    const { from, to, sourceContent, template, language = 'en' } = options;
 
     try {
         if (!process.env.GEMINI_API_KEY) {
@@ -71,22 +94,56 @@ export async function transformWithGemini(
 
         // Build transformation prompt
         const promptModule = await import(`./prompts/${from.toLowerCase()}-to-${to.toLowerCase()}`);
-        const prompt = promptModule.buildTransformPrompt(sourceContent, template);
+        const prompt = promptModule.buildTransformPrompt(sourceContent, template, language);
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
 
         return response.text();
     } catch (error: any) {
-        // Enhanced error messages
-        if (error.status === 429) {
-            throw new Error(`Gemini API quota exceeded. Please try again later or use Ollama (local) instead. Details: ${error.message}`);
-        } else if (error.status === 401 || error.status === 403) {
-            throw new Error(`Gemini API authentication failed. Please check your GEMINI_API_KEY in .env file.`);
-        } else if (error.message?.includes('GEMINI_API_KEY')) {
-            throw error; // Re-throw our custom message
-        } else {
-            throw new Error(`Gemini API error: ${error.message || 'Unknown error'}`);
+        handleGeminiError(error);
+        return '';
+    }
+}
+
+export async function* transformWithGeminiStream(
+    options: TransformOptions
+): AsyncGenerator<string, void, unknown> {
+    const { from, to, sourceContent, template, language = 'en' } = options;
+
+    try {
+        if (!process.env.GEMINI_API_KEY) {
+            throw new Error('GEMINI_API_KEY is not configured. Please add it to your .env file.');
         }
+
+        const model = genAI.getGenerativeModel({
+            model: process.env.GEMINI_MODEL || DEFAULT_MODEL
+        });
+
+        const promptModule = await import(`./prompts/${from.toLowerCase()}-to-${to.toLowerCase()}`);
+        const prompt = promptModule.buildTransformPrompt(sourceContent, template, language);
+
+        const result = await model.generateContentStream(prompt);
+
+        for await (const chunk of result.stream) {
+            const chunkText = chunk.text();
+            if (chunkText) {
+                yield chunkText;
+            }
+        }
+    } catch (error: any) {
+        handleGeminiError(error);
+    }
+}
+
+function handleGeminiError(error: any) {
+    if (error.status === 429) {
+        throw new Error(`Gemini API quota exceeded. Please try again later or use Ollama (local) instead. Details: ${error.message}`);
+    } else if (error.status === 401 || error.status === 403) {
+        throw new Error(`Gemini API authentication failed. Please check your GEMINI_API_KEY in .env file.`);
+    } else if (error.message?.includes('GEMINI_API_KEY')) {
+        throw error;
+    } else {
+        throw new Error(`Gemini API error: ${error.message || 'Unknown error'}`);
     }
 }

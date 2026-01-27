@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { transformDocument } from '@/lib/ai/ai-service';
 import { prisma } from '@/lib/db';
+import { createClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
     try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 }
+            );
+        }
+
         const body = await request.json();
         const { srsId, template, aiProvider } = body;
 
@@ -69,6 +80,7 @@ export async function POST(request: NextRequest) {
                 markdown: result.content,
                 template,
                 sourceId: srsId, // Link to parent SRS
+                userId: user.id, // Added userId
             },
         });
 
@@ -80,6 +92,7 @@ export async function POST(request: NextRequest) {
                 aiProvider: result.provider,
                 aiModel: result.model,
                 tokensUsed: estimateTokens(srs.markdown + result.content),
+                userId: user.id, // Added userId
             },
         });
 

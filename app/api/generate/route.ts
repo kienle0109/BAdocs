@@ -1,11 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateDocument } from '@/lib/ai/ai-service';
 import { prisma } from '@/lib/db';
+import { createClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
     try {
+        console.log('[API] POST /api/generate started');
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            console.error('[API] Unauthorized access attempt');
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 }
+            );
+        }
+
         const body = await request.json();
         const { inputMethod, data, template, aiProvider, language = 'en' } = body;
+        console.log(`[API] Processing request: provider=${aiProvider}, template=${template}, language=${language}`);
+
+        // ... (validation code)
 
         // Validate inputs
         if (!data) {
@@ -30,39 +46,71 @@ export async function POST(request: NextRequest) {
         }
 
         // Normalize input based on method
-        const inputText = data; // For 'form' mode, data is already formatted by formatStructuredData in frontend
+        let inputForAI: any = data;
+
+        // If data is structured object (from form), map it to BRDInput expected by generator
+        if (typeof data === 'object' && data !== null && inputMethod === 'form') {
+            inputForAI = {
+                projectName: data.projectInfo?.projectName || 'Untitled Project',
+                description: data.businessContext?.problem || '',
+                stakeholders: data.stakeholders?.map((s: any) => `${s.name} (${s.role})`) || [],
+                features: data.scope?.features || [],
+                scope: {
+                    inScope: data.scope?.inScope || [],
+                    outOfScope: data.scope?.outScope || []
+                },
+                targetAudience: 'Stakeholders',
+                constraints: {
+                    budget: data.constraints?.budget,
+                    timeline: data.constraints?.timeline,
+                    technical: data.constraints?.technical,
+                    risks: data.risks // Pass risks array directly
+                },
+                goals: {
+                    primary: data.goals?.primary,
+                    metrics: data.goals?.metrics,
+                    timeline: data.goals?.timeline
+                }
+            };
+        }
 
         // Generate BRD using AI
+        console.log('[API] Calling generateDocument...');
         const startTime = Date.now();
         const result = await generateDocument({
             type: 'BRD',
-            input: inputText,
+            input: inputForAI,
             template: template as 'IEEE' | 'IIBA',
             provider: aiProvider as 'ollama' | 'gemini',
             language: language as 'en' | 'vi',
         });
+        console.log('[API] Generation complete. Length:', result.content.length);
 
         const generationTime = Date.now() - startTime;
 
         // Save to database
+        console.log('[API] Saving to database...');
         const document = await prisma.document.create({
             data: {
                 type: 'BRD',
                 title: extractTitle(result.content) || 'Untitled BRD',
-                content: JSON.stringify({ inputMethod, rawInput: inputText }),
+                content: JSON.stringify({ inputMethod, rawInput: data }),
                 markdown: result.content,
                 template,
+                userId: user.id,
             },
         });
+        console.log('[API] Document saved:', document.id);
 
         // Save generation history
         await prisma.generationHistory.create({
             data: {
                 documentId: document.id,
-                inputData: JSON.stringify({ inputMethod, dataLength: inputText.length }),
+                userId: user.id,
+                inputData: JSON.stringify({ inputMethod, dataLength: typeof data === 'string' ? data.length : JSON.stringify(data).length }),
                 aiProvider: result.provider,
                 aiModel: result.model,
-                tokensUsed: estimateTokens(inputText + result.content),
+                tokensUsed: estimateTokens((typeof data === 'string' ? data : JSON.stringify(data)) + result.content),
             },
         });
 
@@ -83,7 +131,8 @@ export async function POST(request: NextRequest) {
         });
 
     } catch (error: any) {
-        console.error('BRD Generation Error:', error);
+        console.error('[API Error] BRD Generation failed:', error);
+        console.error('[API Error] Stack trace:', error.stack);
 
         return NextResponse.json(
             {
